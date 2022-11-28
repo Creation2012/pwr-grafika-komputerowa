@@ -10,9 +10,6 @@ from glfw.GLFW import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-cell_size = 1
-shift = 2
-
 def startup():
     update_viewport(None, 400, 400)
     glClearColor(0.5, 0.5, 0.5, 1.0)
@@ -46,14 +43,14 @@ def triangle(size):
 def square(x,y,a,b):
     #glClear(GL_COLOR_BUFFER_BIT)
 
-    glColor3f(1., 1., 1.)
+    glColor3f(0.5, 0.5, 0.5)
     glBegin(GL_TRIANGLES)
     glVertex2f(x, y)
     glVertex2f(x, y+a)
     glVertex2f(x+b, y)
     glEnd()
 
-    glColor3f(1., 1., 1.)
+    glColor3f(0.5, 0.5, 0.5)
     glBegin(GL_TRIANGLES)
     glVertex2f(x+b, y+a)
     glVertex2f(x+b, y)
@@ -158,17 +155,11 @@ def square_clr(x,y,a,b,color):
 
     glFlush()
 
-def x_wall(x,y):
+def x_wall(x,y, cell_size, shift):
     square(x + shift, y, shift, cell_size) # poziomo 
 
-def y_wall(x,y):
+def y_wall(x,y, cell_size, shift):
     square(x,y+shift,cell_size,shift) # pionowo
-
-def detect_wall(tab, i, j, s):
-    if ((i - j) % s) == 0:
-        y_wall(tab[i % s][int(j/s)][0],tab[i%s][int(j/s)][1])
-    else:
-        x_wall(tab[i % s][int(j/s)][1],tab[i%s][int(j/s)][0])
 
 def neighbours(graph,i,j,size,s):
     if i - s >= 0 and graph[i-s][j] == 0:
@@ -187,12 +178,10 @@ def neighbours(graph,i,j,size,s):
     return graph
 
 def maze_foundry(size, s):
-    global shift
-    shift = 2
+    shift = 2 
     x_start = -size/2
     y_start = -size/2
     mul = size / s
-    global cell_size
     cell_size = mul - shift
     tab = np.zeros((s,s), dtype=(float,2)) 
     square_clr(x_start,y_start,size+shift,size+shift,glColor3f(5.0, 0.0, 0.0))
@@ -203,10 +192,14 @@ def maze_foundry(size, s):
             square_clr(x_pos, y_pos, cell_size, mul - shift,glColor3f(1.0, 1.0, 1.0)) 
             tab[i][j] = (x_pos - shift, y_pos - shift) # tu przechowywac miejsce (x,y)
 
+    return tab
+
 def maze_prim(tab,size,s):
+    shift = 2 
     x_start = -size/2
     y_start = -size/2
     mul = size / s
+    cell_size = mul - shift
     graph = np.zeros((s*s,s*s))
     global visited
     visited = set()
@@ -214,14 +207,10 @@ def maze_prim(tab,size,s):
     for i in range(0,s*s):
         graph = neighbours(graph,i,i,s,s)
 
-    #print(graph)
+    print(graph)
     path = kruskal.kruskalMST(graph,s * s)
-    #print(path)
-
-    for wall in path:
-        detect_wall(tab,wall[0], wall[1], s)
-
-    time.sleep(2.0)
+    print(path)
+    time.sleep(1.0)
 
 def render(time):
     #triangle(60)
