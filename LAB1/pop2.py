@@ -17,7 +17,7 @@ x_start = 0
 y_start = 0
 mul = 1
 size = 100
-s = 3
+s = 20 
 
 def startup():
     update_viewport(None, 1600, 1600)
@@ -264,8 +264,8 @@ def maze_foundry(sarg,field):
 
 def maze_kruskal():
     global visited
+    global s
     visited = set()
-
 
     #prinr(graph)
     path = kruskal.kruskalMST(graph,s * s)
@@ -283,7 +283,8 @@ def render(time):
     #square(0,0,50,80,glColor3f(0.5, 0.0, 0.0))
     #square_rnd(0,0,50,90,3.5)
     #sierpinski(-100.0, -100.0, 200.0, 6, True)
-    maze_foundry(150,10)
+    global s
+    maze_foundry(150,s)
     maze_kruskal()
     maze_entrance_and_exit()
 
@@ -323,7 +324,7 @@ def main():
     glfwSwapInterval(1)
 
     global graph
-    s = 10
+    global s
     graph = np.zeros((s*s,s*s))
     for i in range(0,s*s):
         graph = neighbours(graph,i,i,s,s)
