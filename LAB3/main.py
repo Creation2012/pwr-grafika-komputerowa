@@ -104,17 +104,6 @@ def calc_eye():
     y = R * np.sin(abs(np.radians(phi%check)))
     z = R * np.sin(abs(np.radians(theta%check))) * np.cos(abs(np.radians(phi%check)))
 
-    # z roll param
-    # mozliwy Gimbal Lock
-    #x = R * -np.cos(yaw) * np.sin(pitch) * np.sin(roll) - np.sin(yaw) * np.cos(roll)
-    #y = R * -np.sin(yaw) * np.sin(pitch) * np.sin(roll) + np.cos(yaw) * np.cos(roll)
-    #z = R * np.cos(pitch) * np.sin(roll)
-
-    # calosciowe
-    #x = R * np.sin(yaw)
-    #y = R * -(np.sin(pitch)*np.cos(yaw))
-    #z = R * -(np.cos(pitch)*np.cos(yaw))
-
     return [x,y,z]
 
 def render(time):
@@ -124,20 +113,30 @@ def render(time):
     global R
     global viewer
     global direction
+    global up_swap
+    global upY
     slp = .001
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
-    gluLookAt(viewer_beg[0], viewer_beg[1], viewer_beg[2], 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 
     # theta - kąt azymutu
     # phi - kąt elewacji
 
     if left_mouse_button_pressed:
         theta += delta_x * pix2angle
+        theta = theta % 360
         phi += delta_y * pix2angle
+        phi = phi % 360
 
+    print(phi)
+
+    if phi == 90 or phi == 270:
+        upY = -upY
+        phi += 1
+
+    gluLookAt(viewer_beg[0], viewer_beg[1], viewer_beg[2], 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
     #glRotatef(theta, 0.0, 1.0, 0.0)
     #glRotatef(phi, 1.0, 0.0, 0.0)
 
@@ -154,8 +153,6 @@ def render(time):
 
     #glScalef(scale,scale,scale)
 
-    global up_swap
-    global upY
 
     gluLookAt(viewer[0], viewer[1], viewer[2],
               0.0, 0.0, 0.0, 
@@ -165,26 +162,6 @@ def render(time):
     old_pos = viewer[1]
     viewer = calc_eye()
     direction = viewer[1] - old_pos
-
-    if direction != 0:
-        if viewer[1] == R:
-            if upY == 1.0 and direction >= 0.0:
-                upY = -1.0
-                print("W górę 1")
-                t.sleep(slp)
-            elif upY == -1.0 and direction >= 0.0:
-                upY = 1.0
-                print("W górę 2")
-                t.sleep(slp)
-        elif viewer[1] == -R:
-            if upY == 1.0 and direction <= 0.0:
-                upY = -1.0
-                print("W dół 1")
-                t.sleep(slp)
-            elif upY == -1.0 and direction <= 0.0:
-                upY = 1.0
-                print("W dół 2")
-                t.sleep(slp)
 
     axes()
     example_object()
