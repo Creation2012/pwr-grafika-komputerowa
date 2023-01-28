@@ -124,6 +124,7 @@ def render(time):
     global R
     global viewer
     global direction
+    global upY
     slp = .001
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -138,6 +139,16 @@ def render(time):
         theta += delta_x * pix2angle
         phi += delta_y * pix2angle
 
+    if phi > 180:
+        phi -= 2 * 180
+    elif phi <= -180:
+        phi += 2 * 180
+
+    if phi < -180 / 2 or phi > 180 / 2:
+        upY = -1.0
+    else:
+        upY = 1.0
+
     #glRotatef(theta, 0.0, 1.0, 0.0)
     #glRotatef(phi, 1.0, 0.0, 0.0)
 
@@ -148,44 +159,35 @@ def render(time):
         if zoomin < R + 0.05 * delta_y  < zoomout: # nie ma co ujemnych jak R startuje 1.0
             R += 0.05 * delta_y
     else:
-        pass
         #scale = 1.0
-        #R = 1.0
+        R = 1.0
 
     #glScalef(scale,scale,scale)
 
     global up_swap
-    global upY
-
-    gluLookAt(viewer[0], viewer[1], viewer[2],
-              0.0, 0.0, 0.0, 
-              0.0, upY, 0.0)
-
 
     old_pos = viewer[1]
     viewer = calc_eye()
     direction = viewer[1] - old_pos
+    
 
-    if direction != 0:
-        if viewer[1] == R:
-            if upY == 1.0 and direction >= 0.0:
-                upY = -1.0
-                print("W górę 1")
-                t.sleep(slp)
-            elif upY == -1.0 and direction >= 0.0:
-                upY = 1.0
-                print("W górę 2")
-                t.sleep(slp)
-        elif viewer[1] == -R:
-            if upY == 1.0 and direction <= 0.0:
-                upY = -1.0
-                print("W dół 1")
-                t.sleep(slp)
-            elif upY == -1.0 and direction <= 0.0:
-                upY = 1.0
-                print("W dół 2")
-                t.sleep(slp)
+    #if direction != 0:
+    #    if viewer[1] == R:
+    #        if upY == 1.0 and direction >= 0.0:
+    #            upY = -1.0
+    #            t.sleep(slp)
+    #        elif upY == -1.0 and direction >= 0.0:
+    #            upY = 1.0
+    #            t.sleep(slp)
+    #    elif viewer[1] == -R:
+    #        if upY == 1.0 and direction <= 0.0:
+    #            upY = -1.0
+    #            t.sleep(slp)
+    #        elif upY == -1.0 and direction <= 0.0:
+    #            upY = 1.0
+    #            t.sleep(slp)
 
+    gluLookAt(viewer[0], viewer[1], viewer[2], 0.0, 0.0, 0.0, 0.0, upY, 0.0)
     axes()
     example_object()
 

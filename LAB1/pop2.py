@@ -17,7 +17,7 @@ x_start = 0
 y_start = 0
 mul = 1
 size = 100
-s = 20 
+s = 4 
 
 def startup():
     update_viewport(None, 1600, 1600)
