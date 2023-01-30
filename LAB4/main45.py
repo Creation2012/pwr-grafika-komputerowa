@@ -52,6 +52,9 @@ rgb_position = ["R","G","B"]
 position = [0,1,2]
 current_position = 0
 
+def spin(angle):
+    glRotatef(angle, 1.0, 0.0, 0.0)
+
 def startup():
     update_viewport(None, 400, 400)
     glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -77,22 +80,22 @@ def startup():
     glEnable(GL_LIGHT0)
 
     # second light
-    glLightfv(GL_LIGHT1, GL_AMBIENT, light_diffuse_s)
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, light_ambient_s)
-    glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular_s)
-    glLightfv(GL_LIGHT1, GL_POSITION, light_position_s)
+    #glLightfv(GL_LIGHT1, GL_AMBIENT, light_diffuse_s)
+    #glLightfv(GL_LIGHT1, GL_DIFFUSE, light_ambient_s)
+    #glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular_s)
+    #glLightfv(GL_LIGHT1, GL_POSITION, light_position_s)
 
-    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, att_constant)
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, att_linear)
-    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, att_quadratic)
+    #glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, att_constant)
+    #glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, att_linear)
+    #glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, att_quadratic)
 
-    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, att_constant)
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, att_linear)
-    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, att_quadratic)
+    #glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, att_constant)
+    #glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, att_linear)
+    #glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, att_quadratic)
 
-    glShadeModel(GL_SMOOTH)
-    glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT1)
+    #glShadeModel(GL_SMOOTH)
+    #glEnable(GL_LIGHTING)
+    #glEnable(GL_LIGHT1)
 
 def light_update():
     global viewer_light
@@ -146,23 +149,28 @@ def render(time):
         upY = -upY
         phi += 1
 
-
     # Budowa wyswietlanego obiektu
-    quadric = gluNewQuadric()
-    gluQuadricDrawStyle(quadric, GLU_FILL)
-    gluSphere(quadric, 3.0, 10, 10)
-    gluDeleteQuadric(quadric)
+    #quadric = gluNewQuadric()
+    #gluQuadricDrawStyle(quadric, GLU_FILL)
+    #gluSphere(quadric, 3.0, 10, 10)
+    #gluDeleteQuadric(quadric)
 
-    offset = 25
+    #glRotatef(theta,0.1,1.0,0.0)
+    #spin(time * 180 / np.pi)
+    glPushMatrix()
+    egg_triangles(35,time)
+    glRotatef(time*180/np.pi%360, 0, 1, 0)
+    glPopMatrix()
+
+    offset = 30
     viewer_light = [x + offset for x in viewer_light]
 
-    #glRotatef(theta, 0.0, 1.0, 0.0)
-    glRotatef(theta,0.1,1.0,0.0)
+    glRotatef(theta, 0.0, 1.0, 0.0)
     glRotatef(phi,1.0,0.0,0.0)
     glScale(0.1,0.1,0.1)
     glTranslatef(viewer_light[0],viewer_light[1],viewer_light[2])
 
-    # TODO: do zadania na 4.0
+    glColor3f(0.8,0.8,0.1)
     quadric = gluNewQuadric()
     gluQuadricDrawStyle(quadric, GLU_LINE)
     gluSphere(quadric, 3.0, 6, 5)
@@ -172,6 +180,69 @@ def render(time):
     light_update()
 
     glFlush()
+
+def xTrans(u,v):
+    return (-90 * u ** 5 + 225 * u ** 4 - 270 * u ** 3 + 180 * u ** 2 - 45 * u) * np.cos(np.pi * v)
+
+def yTrans(u,v):
+    return 160 * u ** 4 - 320 * u ** 3 + 160 * u ** 2 - 5
+
+def zTrans(u,v):
+    return (-90 * u ** 5 + 225 * u ** 4 - 270 * u ** 3 + 180 * u ** 2 - 45 * u) * np.sin(np.pi * v)
+
+def egg_triangles(N,time):
+    #spin(time * 179 / np.pi )
+    #global colors
+    glBegin(GL_TRIANGLES)
+    tab = np.zeros((N,N,3))
+    for i in range(N):
+        u = i / (N - 1)
+        for j in range(N):
+            v = j / (N - 1)
+            tab[i,j,0] = xTrans(u,v)
+            tab[i,j,1] = yTrans(u,v)
+            tab[i,j,2] = zTrans(u,v)
+
+
+    for i in range(N-1):
+        for j in range(N-1):
+            x = tab[i,j,0]
+            y = tab[i,j,1]
+            z = tab[i,j,2]
+            glNormal3f(0,0,1)
+            glVertex3f(x,y,z)
+
+            x = tab[i,j+1,0]
+            y = tab[i,j+1,1]
+            z = tab[i,j+1,2]
+            glNormal3f(0,0,1)
+            glVertex3f(x,y,z)
+
+            x = tab[i+1,j,0]
+            y = tab[i+1,j,1]
+            z = tab[i+1,j,2]
+            glNormal3f(0,0,1)
+            glVertex3f(x,y,z)
+
+            x = tab[i,j+1,0]
+            y = tab[i,j+1,1]
+            z = tab[i,j+1,2]
+            glNormal3f(0,0,1)
+            glVertex(x,y,z)
+
+            x = tab[i+1,j,0]
+            y = tab[i+1,j,1]
+            z = tab[i+1,j,2]
+            glNormal3f(0,0,1)
+            glVertex3f(x,y,z)
+
+            x = tab[i+1,j+1,0]
+            y = tab[i+1,j+1,1]
+            z = tab[i+1,j+1,2]
+            glNormal3f(0,0,1)
+            glVertex3f(x,y,z)
+
+    glEnd()
 
 def calc_eye():
      global theta

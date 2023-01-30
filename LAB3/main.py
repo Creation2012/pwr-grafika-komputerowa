@@ -96,7 +96,7 @@ def calc_eye():
     global theta
     global phi
     global R
-    check = 360 
+    check = 360
     yaw = abs(np.radians(theta % check))
     pitch = abs(np.radians(phi % check))
     roll = abs(np.radians(R % check))
@@ -167,16 +167,13 @@ def render(time):
     old_pos = viewer[1]
     viewer = calc_eye()
     direction = viewer[1] - old_pos
-    
 
     gluLookAt(viewer[0], viewer[1], viewer[2], 0.0, 0.0, 0.0, 0.0, upY, 0.0)
 
     axes()
     example_object()
 
-
     glFlush()
-
 
 def update_viewport(window, width, height):
     global pix2angle
